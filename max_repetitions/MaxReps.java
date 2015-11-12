@@ -1,51 +1,46 @@
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 public class MaxReps {
 
   public String getMaxReps(List<String> input) {
     // expected size of 'count', this should be the upper limit.
-    Map<String, Data> data = new HashMap<>(input.size());
+    Map<String, IncLong> data = new HashMap<>(input.size());
+
+    String common = null;
 
     for (String s : input) {
-      if (!data.containsKey(s)) {
-        data.put(s, new Data(s));
+      if (common == null) {
+        common = s;
       }
-      data.get(s).incrementOcurrence();
+
+      if (!data.containsKey(s)) {
+        data.put(s, new IncLong());
+      }
+
+      long currentOcc = data.get(s).increment();
+
+      if (currentOcc > data.get(common).get()) {
+        common = s;
+      }
     }
 
-    TreeSet<Data> result = new TreeSet<>(data.values());
-    return result.first().getString();
+    return common;
+
   }
 
-  static class Data implements Comparable<Data> {
-    String data;
-    long occurrence;
+  static class IncLong {
+    private long occurrence = 1L;
 
-    public Data(String data) {
-      this.data = data;
-      this.occurrence = 0L;
+    public long increment() {
+      return ++this.occurrence;
     }
 
-    public void incrementOcurrence() {
-      this.occurrence++;
-    }
-
-    public String getString() {
-      return this.data;
-    }
-
-    public long getOccurrence() {
+    public long get() {
       return occurrence;
     }
 
-    @Override
-    public int compareTo(Data o) {
-      assert (o != null);
-      return Long.compare(o.getOccurrence(), this.occurrence);
-    }
   }
 
 }
